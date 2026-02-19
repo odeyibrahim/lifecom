@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMV · membership application · professional</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f0f3f7;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            color: #1e1e1e;
+        }
+
+        .form-card {
+            max-width: 1000px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 25px 45px -15px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        /* header – black & white with electric blue */
+        .header {
+            background: #000000;
+            padding: 2.2rem 3rem 1.8rem 3rem;
+            border-bottom: 4px solid #0055ff;
+        }
+
+        .header h1 {
+            font-weight: 450;
+            font-size: 2.2rem;
+            letter-spacing: -0.02em;
+            color: #ffffff;
+            margin-bottom: 0.3rem;
+            line-height: 1.2;
+        }
+
+        .header h1 strong {
+            font-weight: 600;
+            color: #ffffff;
+            background: #0055ff;
+            padding: 0.15rem 0.8rem;
+            display: inline-block;
+            border-radius: 40px;
+            font-size: 2rem;
+            margin-left: 8px;
+        }
+
+        .header .subhead {
+            color: #b4bcc8;
+            font-size: 1rem;
+            font-weight: 400;
+            margin-top: 0.6rem;
+            border-left: 3px solid #0055ff;
+            padding-left: 1.4rem;
+        }
+
+        /* body */
+        .form-content {
+            padding: 2.8rem 3rem 3rem 3rem;
+            background: #ffffff;
+        }
+
+        /* hidden honeypot for netlify */
+        .hidden {
+            display: none;
+        }
+
+        /* sections */
+        .section {
+            margin-bottom: 2.5rem;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: #0055ff;
+            margin-bottom: 1.6rem;
+            border-bottom: 2px solid #eef2f6;
+            padding-bottom: 0.6rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.8rem 2.2rem;
+        }
+
+        .full {
+            grid-column: span 2;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            color: #3c4550;
+        }
+
+        .hint {
+            color: #7e8b9c;
+            font-size: 0.7rem;
+            font-weight: 400;
+            text-transform: none;
+            margin-left: 5px;
+        }
+
+        input, select, textarea {
+            background: #ffffff;
+            border: 1.8px solid #dee5ed;
+            border-radius: 14px;
+            padding: 0.9rem 1.3rem;
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.15s ease;
+            color: #1a1f24;
+            width: 100%;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #0055ff;
+            box-shadow: 0 0 0 4px rgba(0, 85, 255, 0.1);
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: #b9c3d0;
+            font-weight: 300;
+        }
+
+        /* radio / checkbox groups */
+        .inline-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.8rem;
+            background: #f9fcff;
+            border-radius: 20px;
+            padding: 0.9rem 1.6rem;
+            border: 1.8px solid #e6ecf3;
+        }
+
+        .inline-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .inline-option input[type="radio"], 
+        .inline-option input[type="checkbox"] {
+            width: 1.2rem;
+            height: 1.2rem;
+            accent-color: #0055ff;
+            margin: 0;
+        }
+
+        .inline-option label {
+            text-transform: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            color: #262e38;
+            letter-spacing: normal;
+        }
+
+        /* commitment block */
+        .commitment-box {
+            background: #fafdff;
+            border-radius: 20px;
+            padding: 1.8rem 2rem;
+            border: 1.8px solid #dce5f0;
+            margin: 1.2rem 0 1.2rem;
+        }
+
+        .checkbox-line {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.3rem;
+        }
+
+        .checkbox-line input[type="checkbox"] {
+            width: 1.2rem;
+            height: 1.2rem;
+            accent-color: #0055ff;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .checkbox-line label {
+            text-transform: none;
+            font-weight: 450;
+            font-size: 0.95rem;
+            letter-spacing: normal;
+            color: #1a202b;
+            line-height: 1.5;
+        }
+
+        .checkbox-line label strong {
+            font-weight: 600;
+            color: #000;
+        }
+
+        .signature-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .sig-field {
+            border-bottom: 2px dashed #bac8d9;
+            padding-bottom: 0.2rem;
+        }
+
+        .sig-field input {
+            border: none;
+            border-radius: 0;
+            padding: 0.5rem 0;
+            background: transparent;
+            font-size: 1rem;
+        }
+
+        .sig-field input:focus {
+            box-shadow: none;
+            border-bottom: 2px solid #0055ff;
+        }
+
+        .sig-label {
+            font-size: 0.7rem;
+            color: #66748b;
+            text-transform: uppercase;
+            font-weight: 500;
+            margin-top: 0.2rem;
+        }
+
+        .btn {
+            background: #0055ff;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 550;
+            padding: 1.1rem 2rem;
+            border: none;
+            border-radius: 60px;
+            width: 100%;
+            cursor: pointer;
+            transition: background 0.15s, box-shadow 0.15s;
+            letter-spacing: 0.02em;
+            margin-top: 2rem;
+            border-bottom: 4px solid #003bb5;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            background: #1a61ff;
+            border-bottom-color: #002a8c;
+        }
+
+        .btn:active {
+            transform: scale(0.99);
+        }
+
+        .footnote {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #8f9dad;
+            margin-top: 1.3rem;
+        }
+
+        @media (max-width: 700px) {
+            .header, .form-content { padding: 1.8rem; }
+            .grid-2 { grid-template-columns: 1fr; }
+            .full { grid-column: span 1; }
+            .signature-row { grid-template-columns: 1fr; }
+            .inline-group { flex-direction: column; gap: 0.8rem; }
+        }
+
+        /* small badge for netlify */
+        .netlify-badge {
+            text-align: right;
+            font-size: 0.7rem;
+            color: #a0b3cc;
+            margin-bottom: 0.5rem;
+        }
+        .netlify-badge span {
+            background: #eef3f9;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-card">
+        <div class="header">
+            <h1>ASSOCIATION OF <strong>MUTUAL VALUES</strong></h1>
+            <div class="subhead">membership application · professional form · netlify ready</div>
+        </div>
+
+        <div class="form-content">
+            <!-- NETLIFY SETUP: form name + data-netlify attribute + hidden bot field -->
+            <div class="netlify-badge"><span>⚡ form submissions managed by netlify</span></div>
+            <form name="membership-application" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+                <!-- necessary netlify hidden input -->
+                <input type="hidden" name="form-name" value="membership-application" />
+                <p class="hidden">
+                    <label>Don’t fill this out if you’re human: <input name="bot-field" /></label>
+                </p>
+
+                <!-- SECTION 1 – PERSONAL DATA (vital info) -->
+                <div class="section">
+                    <div class="section-title">1 · IDENTITY & CONTACT</div>
+                    <div class="grid-2">
+                        <div class="field full">
+                            <label>full legal name <span class="hint">exactly as on id</span></label>
+                            <input type="text" name="fullname" placeholder="e.g., Adebayo O. Lawal" required>
+                        </div>
+                        <div class="field">
+                            <label>date of birth</label>
+                            <input type="date" name="dob" required>
+                        </div>
+                        <div class="field">
+                            <label>gender</label>
+                            <select name="gender" required>
+                                <option value="" disabled selected>— select —</option>
+                                <option>Male</option>
+                                <option>Female</option>
+                                <option>Prefer not to say</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>phone <span class="hint">whatsapp enabled</span></label>
+                            <input type="tel" name="phone" placeholder="+234 800 000 0000" required>
+                        </div>
+                        <div class="field">
+                            <label>email address</label>
+                            <input type="email" name="email" placeholder="hello@domain.com" required>
+                        </div>
+                        <div class="field full">
+                            <label>residential address <span class="hint">city, LGA, state</span></label>
+                            <input type="text" name="address" placeholder="Ikeja, Lagos Mainland, Lagos" required>
+                        </div>
+                        <div class="field full">
+                            <label>occupation / profession</label>
+                            <input type="text" name="occupation" placeholder="e.g., teacher, trader, engineer, civil servant" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2 – MOTIVATION & SOCIO-ECONOMIC AWARENESS (concise, but captures essential) -->
+                <div class="section">
+                    <div class="section-title">2 · MOTIVATION & AWARENESS</div>
+                    <div class="grid-2">
+                        <div class="field full">
+                            <label>how did you learn about AMV?</label>
+                            <input type="text" name="referral" placeholder="friend, church, social media, community meeting..." required>
+                        </div>
+                        <div class="field full">
+                            <label>local community you primarily identify with</label>
+                            <input type="text" name="community" placeholder="e.g., Igbo community in Kano, Lagos traders, youth corps" required>
+                        </div>
+                        <div class="field">
+                            <label>current involvement in ajo/esusu/thrift?</label>
+                            <div class="inline-group">
+                                <div class="inline-option"><input type="radio" name="esusu" value="yes" required> <label>Yes</label></div>
+                                <div class="inline-option"><input type="radio" name="esusu" value="no"> <label>No</label></div>
+                                <div class="inline-option"><input type="radio" name="esusu" value="past"> <label>In the past</label></div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>willing to serve on a committee?</label>
+                            <div class="inline-group">
+                                <div class="inline-option"><input type="radio" name="committee" value="yes" required> <label>Yes</label></div>
+                                <div class="inline-option"><input type="radio" name="committee" value="limited"> <label>Limited time</label></div>
+                                <div class="inline-option"><input type="radio" name="committee" value="no"> <label>Not now</label></div>
+                            </div>
+                        </div>
+                        <div class="field full">
+                            <label>core areas that resonate (select all that apply)</label>
+                            <div class="inline-group" style="gap: 1.5rem;">
+                                <div class="inline-option"><input type="checkbox" name="interest_faith" value="faith"> <label>Christ-like values</label></div>
+                                <div class="inline-option"><input type="checkbox" name="interest_socio" value="socio"> <label>Socio-economic awareness</label></div>
+                                <div class="inline-option"><input type="checkbox" name="interest_philan" value="philan"> <label>Philanthropy</label></div>
+                                <div class="inline-option"><input type="checkbox" name="interest_loans" value="loans"> <label>Community loans</label></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 3 – COMMITMENT (clear, binding) -->
+                <div class="section">
+                    <div class="section-title">3 · MUTUAL COMMITMENT</div>
+                    
+                    <div class="commitment-box">
+                        <div class="checkbox-line">
+                            <input type="checkbox" name="covenant_faith" value="yes" id="cov1" required>
+                            <label for="cov1"><strong>Christ-like values</strong> — I commit to walk in compassion, humility, and integrity with members and the wider world.</label>
+                        </div>
+                        <div class="checkbox-line">
+                            <input type="checkbox" name="covenant_aware" value="yes" id="cov2" required>
+                            <label for="cov2"><strong>Awareness & proactivity</strong> — I will stay aware of socio-economic issues in Nigeria and actively contribute to solutions.</label>
+                        </div>
+                        <div class="checkbox-line">
+                            <input type="checkbox" name="covenant_contrib" value="yes" id="cov3" required>
+                            <label for="cov3"><strong>Philanthropy & mutual loans</strong> — I understand membership includes financial participation (dues, loan fund) and I am ready to take part.</label>
+                        </div>
+                        <div class="checkbox-line">
+                            <input type="checkbox" name="covenant_integrity" value="yes" id="cov4" required>
+                            <label for="cov4"><strong>Community integrity</strong> — I will not exploit the loan system or any member; I will uphold mutual dignity.</label>
+                        </div>
+
+                        <!-- additional context field (professional) -->
+                        <div style="margin: 2rem 0 1.5rem;">
+                            <label>additional information (skills, concerns, past experience) <span class="hint">optional</span></label>
+                            <textarea name="additional_info" rows="2" placeholder="brief and relevant ..."></textarea>
+                        </div>
+
+                        <!-- signature area: name and date (professional) -->
+                        <div class="signature-row">
+                            <div class="sig-field">
+                                <input type="text" name="signature_name" placeholder="Full name (confirm)" required>
+                                <div class="sig-label">electronic signature</div>
+                            </div>
+                            <div class="sig-field">
+                                <input type="date" name="signature_date" required>
+                                <div class="sig-label">date of application</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- professional note -->
+                <div style="font-size:0.8rem; color:#5e6e84; text-align:center; border-top: 1px solid #e3eaf2; padding-top: 1.2rem; margin: 0.2rem 0 0.2rem;">
+                    ✦ by submitting, you affirm that the information given is accurate and you intend to join the Association of Mutual Values as a committed member ✦
+                </div>
+
+                <button type="submit" class="btn">submit membership application</button>
+                <div class="footnote">
+                    this form is protected by netlify forms · you will receive a confirmation after submission
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- netlify automatically detects forms, no extra js needed -->
+</body>
+</html>
