@@ -2,465 +2,813 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AMV · membership application · professional</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Life Cathedral OS - Fixed calendar dates & task adding">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#515E79">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Cathedral OS">
+    <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Cathedral%20OS%22%2C%22short_name%22%3A%22Cathedral%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23515E79%22%2C%22theme_color%22%3A%22%23515E79%22%7D">
+    
+    <title>Cathedral · fixed dates</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* === STRIPPED DOWN STYLE - FIXED === */
+        :root {
+            --color-primary: #515E79;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            --bg-dark: #1e293b;
+            --border-light: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-inverse: #ffffff;
+            --shadow-md: 0 2px 4px rgba(0,0,0,0.1);
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 0.9375rem;
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 0.75rem;
+            --space-lg: 1rem;
+            --space-xl: 1.25rem;
+            --z-sticky: 200;
+            --z-modal: 400;
+            --z-toast: 500;
         }
-
+        .dark-mode {
+            --bg-primary: #101419;
+            --bg-secondary: #1C222C;
+            --bg-tertiary: #334155;
+            --border-light: #475569;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-inverse: #DFDEDE;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
         body {
-            background: #f0f3f7;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.4;
             min-height: 100vh;
-            padding: 2rem 1.5rem;
-            color: #1e1e1e;
+            font-size: var(--text-base);
         }
-
-        .form-card {
-            max-width: 1000px;
-            width: 100%;
-            background: #ffffff;
-            border-radius: 28px;
-            box-shadow: 0 25px 45px -15px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-            border: 1px solid #e2e8f0;
-        }
-
-        /* header – black & white with electric blue */
+        .app-container { display:flex; flex-direction:column; min-height:100vh; }
         .header {
-            background: #000000;
-            padding: 2.2rem 3rem 1.8rem 3rem;
-            border-bottom: 4px solid #0055ff;
+            background: var(--bg-primary); border-bottom:1px solid var(--border-light);
+            padding: var(--space-md) var(--space-lg); position:sticky; top:0; z-index:var(--z-sticky);
+            display:flex; align-items:center; justify-content:space-between;
+            padding-top: max(var(--space-md), env(safe-area-inset-top));
         }
+        .date-display { font-weight:500; font-size:var(--text-sm); color:var(--text-secondary); cursor:pointer; padding:var(--space-sm) var(--space-md); border-radius:var(--radius-md); }
+        .date-display:hover { background:var(--bg-secondary); }
+        .icon-btn { width:36px; height:36px; border-radius:var(--radius-md); border:none; background:transparent; color:var(--text-secondary); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+        .icon-btn:hover { background:var(--bg-secondary); color:var(--text-primary); }
+        .sidebar { display:none; width:64px; background:var(--bg-primary); border-right:1px solid var(--border-light); position:fixed; left:0; top:0; bottom:0; z-index:var(--z-sticky); padding-top:60px; }
+        .sidebar-items { display:flex; flex-direction:column; align-items:center; gap:var(--space-sm); padding:var(--space-lg) 0; }
+        .sidebar-item { width:40px; height:40px; border-radius:var(--radius-md); border:none; background:transparent; color:var(--text-secondary); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.25rem; }
+        .sidebar-item:hover { background:var(--bg-tertiary); }
+        .sidebar-item.active { background:var(--color-primary); color:var(--text-inverse); }
+        .bottom-nav { background:var(--bg-primary); border-top:1px solid var(--border-light); padding:var(--space-sm) var(--space-lg); padding-bottom:max(var(--space-sm), env(safe-area-inset-bottom)); position:fixed; bottom:0; left:0; right:0; z-index:var(--z-sticky); display:none; }
+        .bottom-nav-items { display:flex; justify-content:space-around; }
+        .nav-item { display:flex; flex-direction:column; align-items:center; gap:2px; background:none; border:none; color:var(--text-secondary); padding:var(--space-sm); font-size:var(--text-xs); cursor:pointer; }
+        .nav-item.active { color:var(--color-primary); }
+        .nav-item i { font-size:1.25rem; }
+        .main-content { flex:1; padding:var(--space-lg); padding-bottom:max(80px, var(--space-lg) + env(safe-area-inset-bottom)); width:100%; max-width:1200px; margin:0 auto; }
+        .view-container { display:none; width:100%; }
+        .view-container.active { display:block; animation:fadeIn 0.25s ease; }
+        @keyframes fadeIn { from { opacity:0.8; } to { opacity:1; } }
 
-        .header h1 {
-            font-weight: 450;
-            font-size: 2.2rem;
-            letter-spacing: -0.02em;
-            color: #ffffff;
-            margin-bottom: 0.3rem;
-            line-height: 1.2;
+        /* --- flow view --- */
+        .rhythm-header {
+            padding: 8px; background: var(--bg-secondary); margin: 8px 0 2px 0;
+            border-radius: var(--radius-sm); font-size: 0.9rem; color: var(--text-secondary);
+            border-left: 3px solid var(--color-primary);
         }
+        .time-grid { display:grid; gap:1px; background:#263138; border-radius:var(--radius-md); overflow:hidden; }
+        .time-block { display:flex; align-items:center; gap:var(--space-md); padding:var(--space-md); background:var(--bg-primary); cursor:pointer; min-height:56px; }
+        .time-block:hover { background:var(--bg-secondary); }
+        .time-block.current { background:var(--color-primary); color:var(--text-inverse); }
+        .time-block.locked { opacity:0.7; }
+        .time-label { font-size:var(--text-sm); color:var(--text-secondary); min-width:70px; }
+        .time-block.current .time-label { color:var(--text-inverse); }
+        .block-content { flex:1; }
+        .block-title { font-weight:500; }
+        .task-count { font-size:0.8rem; color:var(--text-secondary); margin-left:var(--space-sm); }
 
-        .header h1 strong {
-            font-weight: 600;
-            color: #ffffff;
-            background: #0055ff;
-            padding: 0.15rem 0.8rem;
-            display: inline-block;
-            border-radius: 40px;
-            font-size: 2rem;
-            margin-left: 8px;
-        }
+        /* --- calendar --- */
+        .calendar-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--space-lg); }
+        .month-nav { display:flex; align-items:center; gap:var(--space-sm); }
+        .month-year { font-weight:600; min-width:140px; text-align:center; }
+        .calendar-grid { background:var(--bg-primary); border:1px solid var(--border-light); border-radius:var(--radius-lg); overflow:hidden; }
+        .weekdays { display:grid; grid-template-columns:repeat(7,1fr); background:var(--bg-secondary); border-bottom:1px solid var(--border-light); }
+        .weekday { padding:var(--space-md); text-align:center; font-size:var(--text-xs); color:var(--text-secondary); }
+        .calendar-days { display:grid; grid-template-columns:repeat(7,1fr); }
+        .calendar-day { min-height:70px; border:1px solid var(--border-light); padding:4px; cursor:pointer; background:var(--bg-primary); position:relative; }
+        .calendar-day:hover { background:var(--bg-secondary); }
+        .calendar-day.today { background:var(--color-primary); color:var(--text-inverse); }
+        .calendar-day.past { opacity:0.6; }
+        .calendar-day.other-month { opacity:0.4; }
+        .day-number { font-size:var(--text-sm); font-weight:500; }
+        .day-task-count { font-size:10px; color:var(--text-secondary); margin-top:2px; }
+        .calendar-day.today .day-task-count { color:var(--text-inverse); }
+        .day-add-btn { position:absolute; bottom:2px; right:2px; width:22px; height:22px; border-radius:50%; background:var(--color-primary); color:white; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:12px; opacity:0; transition:opacity 0.1s; }
+        .calendar-day:hover .day-add-btn { opacity:1; }
 
-        .header .subhead {
-            color: #b4bcc8;
-            font-size: 1rem;
-            font-weight: 400;
-            margin-top: 0.6rem;
-            border-left: 3px solid #0055ff;
-            padding-left: 1.4rem;
-        }
+        /* --- notes --- */
+        .data-section { background:var(--bg-primary); border:1px solid var(--border-light); border-radius:var(--radius-lg); padding:var(--space-lg); }
+        .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--space-lg); padding-bottom:var(--space-sm); border-bottom:1px solid var(--border-light); }
+        .section-title { display:flex; align-items:center; gap:var(--space-sm); font-weight:600; }
+        .btn { padding:8px 16px; border-radius:var(--radius-md); border:none; font-weight:500; font-size:var(--text-sm); cursor:pointer; background:var(--color-primary); color:var(--text-inverse); }
+        .btn-small { padding:6px 12px; font-size:var(--text-xs); }
+        .btn-secondary { background:var(--bg-tertiary); color:var(--text-primary); border:1px solid var(--border-light); }
+        .notes-list { display:flex; flex-direction:column; gap:var(--space-md); }
+        .note-item { padding:var(--space-md); background:var(--bg-secondary); border-radius:var(--radius-md); border-left:3px solid var(--color-primary); cursor:pointer; }
+        .note-content { font-size:var(--text-sm); margin-bottom:var(--space-sm); }
+        .note-meta { font-size:var(--text-xs); color:var(--text-secondary); }
 
-        /* body */
-        .form-content {
-            padding: 2.8rem 3rem 3rem 3rem;
-            background: #ffffff;
-        }
+        /* --- modal --- */
+        .modal { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center; z-index:var(--z-modal); padding:var(--space-lg); }
+        .modal.active { display:flex; }
+        .modal-content { background:var(--bg-secondary); border-radius:var(--radius-lg); width:100%; max-width:500px; max-height:90vh; overflow-y:auto; }
+        .modal-header { padding:var(--space-lg); border-bottom:1px solid var(--border-light); display:flex; justify-content:space-between; }
+        .modal-title { font-weight:600; }
+        .modal-body { padding:var(--space-lg); }
+        .modal-actions { padding:var(--space-lg); border-top:1px solid var(--border-light); display:flex; justify-content:flex-end; gap:var(--space-md); }
+        .form-group { margin-bottom:var(--space-md); }
+        .form-label { display:block; margin-bottom:var(--space-xs); font-size:var(--text-sm); color:var(--text-secondary); }
+        .form-input { width:100%; padding:10px; border:1px solid var(--border-light); border-radius:var(--radius-md); background:var(--bg-primary); color:var(--text-primary); }
+        .form-textarea { min-height:80px; resize:vertical; }
+        .info-row { display:flex; margin-bottom:var(--space-md); padding:var(--space-sm) 0; border-bottom:1px solid var(--border-light); }
+        .info-label { width:100px; color:var(--text-secondary); }
+        .info-value { flex:1; font-weight:500; }
+        .status-badge { display:inline-block; padding:4px 12px; border-radius:16px; font-size:var(--text-xs); background:var(--bg-tertiary); }
+        .status-badge.completed { background:var(--color-primary); color:white; }
 
-        /* hidden honeypot for netlify */
-        .hidden {
-            display: none;
-        }
+        /* --- toast --- */
+        .toast { position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:var(--bg-dark); color:white; padding:var(--space-md) var(--space-lg); border-radius:var(--radius-lg); z-index:var(--z-toast); display:none; box-shadow:var(--shadow-md); }
+        .toast.show { display:block; animation:slideUp 0.3s ease; }
+        @keyframes slideUp { from { transform: translate(-50%, 20px); opacity:0; } to { transform: translate(-50%, 0); opacity:1; } }
+        
+        /* Install prompt */
+        .install-prompt { position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:var(--color-primary); color:white; padding:12px 20px; border-radius:30px; display:flex; align-items:center; gap:12px; z-index:1000; }
+        .install-prompt button { background:white; color:var(--color-primary); border:none; padding:6px 16px; border-radius:20px; cursor:pointer; }
+        .install-prompt .close-btn { background:transparent; color:white; padding:4px 8px; }
 
-        /* sections */
-        .section {
-            margin-bottom: 2.5rem;
-        }
-
-        .section-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-            color: #0055ff;
-            margin-bottom: 1.6rem;
-            border-bottom: 2px solid #eef2f6;
-            padding-bottom: 0.6rem;
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.8rem 2.2rem;
-        }
-
-        .full {
-            grid-column: span 2;
-        }
-
-        .field {
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-        }
-
-        label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.02em;
-            color: #3c4550;
-        }
-
-        .hint {
-            color: #7e8b9c;
-            font-size: 0.7rem;
-            font-weight: 400;
-            text-transform: none;
-            margin-left: 5px;
-        }
-
-        input, select, textarea {
-            background: #ffffff;
-            border: 1.8px solid #dee5ed;
-            border-radius: 14px;
-            padding: 0.9rem 1.3rem;
-            font-size: 0.95rem;
-            font-family: 'Inter', sans-serif;
-            transition: all 0.15s ease;
-            color: #1a1f24;
-            width: 100%;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #0055ff;
-            box-shadow: 0 0 0 4px rgba(0, 85, 255, 0.1);
-        }
-
-        input::placeholder, textarea::placeholder {
-            color: #b9c3d0;
-            font-weight: 300;
-        }
-
-        /* radio / checkbox groups */
-        .inline-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.8rem;
-            background: #f9fcff;
-            border-radius: 20px;
-            padding: 0.9rem 1.6rem;
-            border: 1.8px solid #e6ecf3;
-        }
-
-        .inline-option {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .inline-option input[type="radio"], 
-        .inline-option input[type="checkbox"] {
-            width: 1.2rem;
-            height: 1.2rem;
-            accent-color: #0055ff;
-            margin: 0;
-        }
-
-        .inline-option label {
-            text-transform: none;
-            font-weight: 500;
-            font-size: 0.95rem;
-            color: #262e38;
-            letter-spacing: normal;
-        }
-
-        /* commitment block */
-        .commitment-box {
-            background: #fafdff;
-            border-radius: 20px;
-            padding: 1.8rem 2rem;
-            border: 1.8px solid #dce5f0;
-            margin: 1.2rem 0 1.2rem;
-        }
-
-        .checkbox-line {
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-            margin-bottom: 1.3rem;
-        }
-
-        .checkbox-line input[type="checkbox"] {
-            width: 1.2rem;
-            height: 1.2rem;
-            accent-color: #0055ff;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .checkbox-line label {
-            text-transform: none;
-            font-weight: 450;
-            font-size: 0.95rem;
-            letter-spacing: normal;
-            color: #1a202b;
-            line-height: 1.5;
-        }
-
-        .checkbox-line label strong {
-            font-weight: 600;
-            color: #000;
-        }
-
-        .signature-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .sig-field {
-            border-bottom: 2px dashed #bac8d9;
-            padding-bottom: 0.2rem;
-        }
-
-        .sig-field input {
-            border: none;
-            border-radius: 0;
-            padding: 0.5rem 0;
-            background: transparent;
-            font-size: 1rem;
-        }
-
-        .sig-field input:focus {
-            box-shadow: none;
-            border-bottom: 2px solid #0055ff;
-        }
-
-        .sig-label {
-            font-size: 0.7rem;
-            color: #66748b;
-            text-transform: uppercase;
-            font-weight: 500;
-            margin-top: 0.2rem;
-        }
-
-        .btn {
-            background: #0055ff;
-            color: white;
-            font-size: 1.2rem;
-            font-weight: 550;
-            padding: 1.1rem 2rem;
-            border: none;
-            border-radius: 60px;
-            width: 100%;
-            cursor: pointer;
-            transition: background 0.15s, box-shadow 0.15s;
-            letter-spacing: 0.02em;
-            margin-top: 2rem;
-            border-bottom: 4px solid #003bb5;
-            text-transform: uppercase;
-        }
-
-        .btn:hover {
-            background: #1a61ff;
-            border-bottom-color: #002a8c;
-        }
-
-        .btn:active {
-            transform: scale(0.99);
-        }
-
-        .footnote {
-            text-align: center;
-            font-size: 0.75rem;
-            color: #8f9dad;
-            margin-top: 1.3rem;
-        }
-
-        @media (max-width: 700px) {
-            .header, .form-content { padding: 1.8rem; }
-            .grid-2 { grid-template-columns: 1fr; }
-            .full { grid-column: span 1; }
-            .signature-row { grid-template-columns: 1fr; }
-            .inline-group { flex-direction: column; gap: 0.8rem; }
-        }
-
-        /* small badge for netlify */
-        .netlify-badge {
-            text-align: right;
-            font-size: 0.7rem;
-            color: #a0b3cc;
-            margin-bottom: 0.5rem;
-        }
-        .netlify-badge span {
-            background: #eef3f9;
-            padding: 0.2rem 0.6rem;
-            border-radius: 20px;
+        .loading-spinner { width:40px; height:40px; border:3px solid var(--border-light); border-top-color:var(--color-primary); border-radius:50%; animation:spin 1s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .empty-state { text-align:center; padding:var(--space-xl); color:var(--text-secondary); }
+        
+        @media (min-width:768px) { .app-container { padding-left:64px; } .sidebar { display:block; } .bottom-nav { display:none; } }
+        @media (max-width:767px) { 
+            .bottom-nav { display:block; } 
+            .main-content { padding-bottom:max(80px, var(--space-md) + env(safe-area-inset-bottom)); } 
+            .calendar-day { min-height:60px; }
+            .day-add-btn { opacity:1; }
         }
     </style>
 </head>
 <body>
-    <div class="form-card">
-        <div class="header">
-            <h1>ASSOCIATION OF <strong>MUTUAL VALUES</strong></h1>
-            <div class="subhead">membership application · professional form · netlify ready</div>
+<div id="loadingScreen" style="position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg-primary);display:flex;align-items:center;justify-content:center;z-index:9999;"><div class="loading-spinner"></div></div>
+
+<!-- Install Prompt -->
+<div id="installPrompt" class="install-prompt" style="display:none;">
+    <span>📱 Install Cathedral</span>
+    <button onclick="app.installPWA()">Install</button>
+    <button class="close-btn" onclick="app.closeInstallPrompt()">✕</button>
+</div>
+
+<div class="app-container">
+    <nav class="sidebar"><div class="sidebar-items">
+        <button class="sidebar-item active" data-view="flow"><i class="fas fa-stream"></i></button>
+        <button class="sidebar-item" data-view="calendar"><i class="fas fa-calendar"></i></button>
+        <button class="sidebar-item" data-view="data"><i class="fas fa-database"></i></button>
+    </div></nav>
+    
+    <header class="header">
+        <div class="date-display" id="currentDate"></div>
+        <button class="icon-btn" id="themeToggle"><i class="fas fa-moon"></i></button>
+    </header>
+    
+    <main class="main-content">
+        <!-- flow view -->
+        <div id="flowView" class="view-container active">
+            <div class="time-grid" id="timeGrid"></div>
         </div>
-
-        <div class="form-content">
-            <!-- NETLIFY SETUP: form name + data-netlify attribute + hidden bot field -->
-            <div class="netlify-badge"><span>⚡ form submissions managed by netlify</span></div>
-            <form name="membership-application" method="POST" data-netlify="true" netlify-honeypot="bot-field">
-                <!-- necessary netlify hidden input -->
-                <input type="hidden" name="form-name" value="membership-application" />
-                <p class="hidden">
-                    <label>Don’t fill this out if you’re human: <input name="bot-field" /></label>
-                </p>
-
-                <!-- SECTION 1 – PERSONAL DATA (vital info) -->
-                <div class="section">
-                    <div class="section-title">1 · IDENTITY & CONTACT</div>
-                    <div class="grid-2">
-                        <div class="field full">
-                            <label>full legal name <span class="hint">exactly as on id</span></label>
-                            <input type="text" name="fullname" placeholder="e.g., Adebayo O. Lawal" required>
-                        </div>
-                        <div class="field">
-                            <label>date of birth</label>
-                            <input type="date" name="dob" required>
-                        </div>
-                        <div class="field">
-                            <label>gender</label>
-                            <select name="gender" required>
-                                <option value="" disabled selected>— select —</option>
-                                <option>Male</option>
-                                <option>Female</option>
-                                <option>Prefer not to say</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label>phone <span class="hint">whatsapp enabled</span></label>
-                            <input type="tel" name="phone" placeholder="+234 800 000 0000" required>
-                        </div>
-                        <div class="field">
-                            <label>email address</label>
-                            <input type="email" name="email" placeholder="hello@domain.com" required>
-                        </div>
-                        <div class="field full">
-                            <label>residential address <span class="hint">city, LGA, state</span></label>
-                            <input type="text" name="address" placeholder="Ikeja, Lagos Mainland, Lagos" required>
-                        </div>
-                        <div class="field full">
-                            <label>occupation / profession</label>
-                            <input type="text" name="occupation" placeholder="e.g., teacher, trader, engineer, civil servant" required>
-                        </div>
-                    </div>
+        
+        <!-- calendar view -->
+        <div id="calendarView" class="view-container">
+            <div class="calendar-header">
+                <div class="month-nav">
+                    <button class="icon-btn" id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                    <div class="month-year" id="monthYear"></div>
+                    <button class="icon-btn" id="nextMonth"><i class="fas fa-chevron-right"></i></button>
                 </div>
-
-                <!-- SECTION 2 – MOTIVATION & SOCIO-ECONOMIC AWARENESS (concise, but captures essential) -->
-                <div class="section">
-                    <div class="section-title">2 · MOTIVATION & AWARENESS</div>
-                    <div class="grid-2">
-                        <div class="field full">
-                            <label>how did you learn about AMV?</label>
-                            <input type="text" name="referral" placeholder="friend, church, social media, community meeting..." required>
-                        </div>
-                        <div class="field full">
-                            <label>local community you primarily identify with</label>
-                            <input type="text" name="community" placeholder="e.g., Igbo community in Kano, Lagos traders, youth corps" required>
-                        </div>
-                        <div class="field">
-                            <label>current involvement in ajo/esusu/thrift?</label>
-                            <div class="inline-group">
-                                <div class="inline-option"><input type="radio" name="esusu" value="yes" required> <label>Yes</label></div>
-                                <div class="inline-option"><input type="radio" name="esusu" value="no"> <label>No</label></div>
-                                <div class="inline-option"><input type="radio" name="esusu" value="past"> <label>In the past</label></div>
-                            </div>
-                        </div>
-                        <div class="field">
-                            <label>willing to serve on a committee?</label>
-                            <div class="inline-group">
-                                <div class="inline-option"><input type="radio" name="committee" value="yes" required> <label>Yes</label></div>
-                                <div class="inline-option"><input type="radio" name="committee" value="limited"> <label>Limited time</label></div>
-                                <div class="inline-option"><input type="radio" name="committee" value="no"> <label>Not now</label></div>
-                            </div>
-                        </div>
-                        <div class="field full">
-                            <label>core areas that resonate (select all that apply)</label>
-                            <div class="inline-group" style="gap: 1.5rem;">
-                                <div class="inline-option"><input type="checkbox" name="interest_faith" value="faith"> <label>Christ-like values</label></div>
-                                <div class="inline-option"><input type="checkbox" name="interest_socio" value="socio"> <label>Socio-economic awareness</label></div>
-                                <div class="inline-option"><input type="checkbox" name="interest_philan" value="philan"> <label>Philanthropy</label></div>
-                                <div class="inline-option"><input type="checkbox" name="interest_loans" value="loans"> <label>Community loans</label></div>
-                            </div>
-                        </div>
-                    </div>
+                <button class="btn btn-small" id="todayCalendarBtn">Today</button>
+            </div>
+            <div class="calendar-grid">
+                <div class="weekdays">
+                    <div class="weekday">Sun</div><div class="weekday">Mon</div><div class="weekday">Tue</div>
+                    <div class="weekday">Wed</div><div class="weekday">Thu</div><div class="weekday">Fri</div><div class="weekday">Sat</div>
                 </div>
-
-                <!-- SECTION 3 – COMMITMENT (clear, binding) -->
-                <div class="section">
-                    <div class="section-title">3 · MUTUAL COMMITMENT</div>
-                    
-                    <div class="commitment-box">
-                        <div class="checkbox-line">
-                            <input type="checkbox" name="covenant_faith" value="yes" id="cov1" required>
-                            <label for="cov1"><strong>Christ-like values</strong> — I commit to walk in compassion, humility, and integrity with members and the wider world.</label>
-                        </div>
-                        <div class="checkbox-line">
-                            <input type="checkbox" name="covenant_aware" value="yes" id="cov2" required>
-                            <label for="cov2"><strong>Awareness & proactivity</strong> — I will stay aware of socio-economic issues in Nigeria and actively contribute to solutions.</label>
-                        </div>
-                        <div class="checkbox-line">
-                            <input type="checkbox" name="covenant_contrib" value="yes" id="cov3" required>
-                            <label for="cov3"><strong>Philanthropy & mutual loans</strong> — I understand membership includes financial participation (dues, loan fund) and I am ready to take part.</label>
-                        </div>
-                        <div class="checkbox-line">
-                            <input type="checkbox" name="covenant_integrity" value="yes" id="cov4" required>
-                            <label for="cov4"><strong>Community integrity</strong> — I will not exploit the loan system or any member; I will uphold mutual dignity.</label>
-                        </div>
-
-                        <!-- additional context field (professional) -->
-                        <div style="margin: 2rem 0 1.5rem;">
-                            <label>additional information (skills, concerns, past experience) <span class="hint">optional</span></label>
-                            <textarea name="additional_info" rows="2" placeholder="brief and relevant ..."></textarea>
-                        </div>
-
-                        <!-- signature area: name and date (professional) -->
-                        <div class="signature-row">
-                            <div class="sig-field">
-                                <input type="text" name="signature_name" placeholder="Full name (confirm)" required>
-                                <div class="sig-label">electronic signature</div>
-                            </div>
-                            <div class="sig-field">
-                                <input type="date" name="signature_date" required>
-                                <div class="sig-label">date of application</div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="calendar-days" id="calendarDays"></div>
+            </div>
+        </div>
+        
+        <!-- notes view -->
+        <div id="dataView" class="view-container">
+            <div class="data-section">
+                <div class="section-header">
+                    <div class="section-title"><i class="fas fa-sticky-note"></i><span>Notes</span></div>
+                    <button class="btn btn-small" id="addNoteBtn"><i class="fas fa-plus"></i></button>
                 </div>
-
-                <!-- professional note -->
-                <div style="font-size:0.8rem; color:#5e6e84; text-align:center; border-top: 1px solid #e3eaf2; padding-top: 1.2rem; margin: 0.2rem 0 0.2rem;">
-                    ✦ by submitting, you affirm that the information given is accurate and you intend to join the Association of Mutual Values as a committed member ✦
-                </div>
-
-                <button type="submit" class="btn">submit membership application</button>
-                <div class="footnote">
-                    this form is protected by netlify forms · you will receive a confirmation after submission
-                </div>
-            </form>
+                <div class="notes-list" id="notesList"></div>
+            </div>
+        </div>
+    </main>
+    
+    <nav class="bottom-nav">
+        <div class="bottom-nav-items">
+            <button class="nav-item active" data-view="flow"><i class="fas fa-stream"></i><span>Flow</span></button>
+            <button class="nav-item" data-view="calendar"><i class="fas fa-calendar"></i><span>Calendar</span></button>
+            <button class="nav-item" data-view="data"><i class="fas fa-database"></i><span>Notes</span></button>
+        </div>
+    </nav>
+    
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle"></div>
+                <button class="icon-btn" id="closeModalBtn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-actions" id="modalActions"></div>
         </div>
     </div>
+    
+    <div class="toast" id="toast"></div>
+</div>
 
-    <!-- netlify automatically detects forms, no extra js needed -->
+<script>
+(function() {
+    // Safe Storage
+    class SafeStorage {
+        static save(key, data) {
+            try { 
+                localStorage.setItem(key, JSON.stringify(data)); 
+                return true; 
+            } catch(e) { 
+                console.warn('Storage failed:', e);
+                return false; 
+            }
+        }
+        static load(key, defaultValue) {
+            try { 
+                const item = localStorage.getItem(key);
+                return item ? JSON.parse(item) : defaultValue; 
+            } catch(e) { 
+                console.warn('Load failed:', e);
+                return defaultValue; 
+            }
+        }
+    }
+
+    // XSS escape
+    function escapeHtml(unsafe) {
+        if (!unsafe) return '';
+        return String(unsafe)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    // Task item template
+    function createTaskListItem(task, onClick) {
+        return `
+            <div style="display:flex;align-items:center;gap:8px;padding:8px;background:var(--bg-secondary);border-radius:var(--radius-md);margin-bottom:4px;cursor:pointer;" 
+                 onclick="${onClick}">
+                <div style="flex:1">${escapeHtml(task.title)}</div>
+                <span style="color:var(--text-secondary);">${task.time}m</span>
+                ${task.completed ? '<i class="fas fa-check-circle" style="color:var(--color-primary);"></i>' : ''}
+            </div>
+        `;
+    }
+
+    // Main App - FIXED VERSION
+    class CathedralOS {
+        constructor() {
+            this.currentDate = this.getToday();
+            this.currentView = 'flow';
+            this.editingTaskId = null;
+            this.editingNoteId = null;
+            this.deferredPrompt = null;
+            
+            this.state = SafeStorage.load('cathedral', this.getInitialState());
+            this.init();
+        }
+
+        getToday() {
+            const d = new Date(); 
+            d.setHours(0,0,0,0); 
+            return d;
+        }
+
+        getInitialState() {
+            const today = this.formatDate(new Date());
+            return {
+                darkMode: window.matchMedia('(prefers-color-scheme: dark)').matches,
+                dailySchedule: [
+                    { id:'1', time:'4:00', title:'Meditation & Scripture' },
+                    { id:'2', time:'5:00', title:'Workout' },
+                    { id:'3', time:'6:00', title:'Creative Work' },
+                    { id:'4', time:'7:00', title:'Breakfast' },
+                    { id:'5', time:'8:00', title:'Projects' },
+                    { id:'6', time:'10:00', title:'Break' },
+                    { id:'7', time:'10:30', title:'Production' },
+                    { id:'8', time:'12:00', title:'Lunch' },
+                    { id:'9', time:'13:00', title:'Rest', locked: true },
+                    { id:'10', time:'15:00', title:'Analytical' },
+                    { id:'11', time:'16:00', title:'Social' },
+                    { id:'12', time:'17:00', title:'Family' },
+                    { id:'13', time:'18:00', title:'Buffer' },
+                    { id:'14', time:'19:00', title:'Learning' },
+                    { id:'15', time:'20:00', title:'Wind Down' },
+                    { id:'16', time:'21:00', title:'Reflection' },
+                    { id:'17', time:'22:00', title:'Sleep', locked: true }
+                ],
+                dailyRhythm: [
+                    { id:'sacred_launch', time:'4:00-7:00', title:'Sacred Launch', blocks:['1','2','3'] },
+                    { id:'mission_zones', time:'7:00-13:00', title:'Mission Zones', blocks:['4','5','6','7','8'] },
+                    { id:'restoration', time:'13:00-15:00', title:'Restoration', blocks:['9'] },
+                    { id:'engagement', time:'15:00-21:00', title:'Engagement', blocks:['10','11','12','13','14','15'] },
+                    { id:'sanctuary', time:'21:00-4:00', title:'Sanctuary', blocks:['16','17'] }
+                ],
+                tasks: [
+                    { id:'task1', title:'Design homepage', time:60, scheduleId:'5', date:today, completed:false, notes:'Focus on minimalist design' },
+                    { id:'task2', title:'Morning workout', time:45, scheduleId:'2', date:today, completed:true, notes:'' },
+                    { id:'task3', title:'Meditation', time:30, scheduleId:'1', date:today, completed:false, notes:'' }
+                ],
+                notes: [
+                    { id:'note1', content:'Best creative work after morning prayer.', createdAt:new Date().toISOString() },
+                    { id:'note2', content:'Remember to stretch before workout.', createdAt:new Date().toISOString() }
+                ]
+            };
+        }
+
+        saveState() { 
+            SafeStorage.save('cathedral', this.state); 
+        }
+        
+        init() {
+            this.applyTheme();
+            this.updateDateDisplay();
+            this.setupEventListeners();
+            this.renderCurrentView();
+            setTimeout(()=>document.getElementById('loadingScreen').style.display='none', 400);
+        }
+
+        // PWA install
+        installPWA() {
+            if(this.deferredPrompt) {
+                this.deferredPrompt.prompt();
+                this.deferredPrompt = null;
+            }
+            this.closeInstallPrompt();
+        }
+        closeInstallPrompt() { 
+            document.getElementById('installPrompt').style.display = 'none'; 
+        }
+
+        applyTheme() {
+            if(this.state.darkMode){ 
+                document.body.classList.add('dark-mode'); 
+                document.querySelector('#themeToggle i').className='fas fa-sun'; 
+            } else { 
+                document.body.classList.remove('dark-mode'); 
+                document.querySelector('#themeToggle i').className='fas fa-moon'; 
+            }
+        }
+        
+        toggleTheme(){ 
+            this.state.darkMode = !this.state.darkMode; 
+            this.applyTheme(); 
+            this.saveState(); 
+            this.showToast('Theme changed'); 
+        }
+
+        updateDateDisplay() {
+            document.getElementById('currentDate').textContent = this.currentDate.toLocaleDateString('en-US',{
+                weekday:'short', month:'short', day:'numeric'
+            });
+        }
+
+        formatDate(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        }
+
+        parseLocalDate(dateStr) {
+            if (!dateStr) return this.getToday();
+            const [y,m,d] = dateStr.split('-').map(Number);
+            return new Date(y, m-1, d);
+        }
+
+        renderCurrentView() {
+            // Update navigation active states
+            document.querySelectorAll('.sidebar-item, .nav-item').forEach(i=>{
+                i.classList.toggle('active', i.dataset.view === this.currentView);
+            });
+            
+            // Show correct view
+            document.querySelectorAll('.view-container').forEach(v=>v.classList.remove('active'));
+            document.getElementById(`${this.currentView}View`).classList.add('active');
+            
+            // Render view content
+            if(this.currentView === 'flow') this.renderFlowView();
+            else if(this.currentView === 'calendar') this.renderCalendarView();
+            else if(this.currentView === 'data') this.renderDataView();
+        }
+
+        renderFlowView() {
+            const container = document.getElementById('timeGrid');
+            const currentHour = new Date().getHours() + new Date().getMinutes()/60;
+            const todayStr = this.formatDate(this.currentDate);
+            
+            let html = '';
+            for(let rhythm of this.state.dailyRhythm) {
+                html += `<div class="rhythm-header">${rhythm.time} • ${rhythm.title}</div>`;
+                for(let blockId of rhythm.blocks) {
+                    const block = this.state.dailySchedule.find(b=>b.id===blockId);
+                    if(!block) continue;
+                    
+                    const blockHour = parseInt(block.time.split(':')[0]);
+                    const isCurrent = Math.floor(blockHour) === Math.floor(currentHour);
+                    const tasks = this.state.tasks.filter(t => t.scheduleId === block.id && t.date === todayStr);
+                    const completed = tasks.filter(t => t.completed).length;
+                    
+                    html += `<div class="time-block ${isCurrent?'current':''} ${block.locked?'locked':''}" onclick="app.viewTimeBlock('${block.id}')">`;
+                    html += `<div class="time-label">${block.time}</div>`;
+                    html += `<div class="block-content"><div class="block-title">${block.title}`;
+                    if(tasks.length) html += `<span class="task-count"> ${completed}/${tasks.length}</span>`;
+                    html += `</div></div></div>`;
+                }
+            }
+            container.innerHTML = html;
+        }
+
+        renderCalendarView() {
+            const monthYear = document.getElementById('monthYear');
+            const container = document.getElementById('calendarDays');
+            const year = this.currentDate.getFullYear();
+            const month = this.currentDate.getMonth();
+            
+            monthYear.textContent = this.currentDate.toLocaleDateString('en-US', { month:'long', year:'numeric' });
+            container.innerHTML = '';
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const lastDate = new Date(year, month + 1, 0).getDate();
+            const today = this.getToday();
+            
+            // Previous month
+            const prevMonthLastDate = new Date(year, month, 0).getDate();
+            for (let i = 0; i < firstDay; i++) {
+                const day = prevMonthLastDate - firstDay + i + 1;
+                const date = new Date(year, month - 1, day);
+                container.appendChild(this.createDayCell(date, false, false, true));
+            }
+            
+            // Current month
+            for (let day = 1; day <= lastDate; day++) {
+                const date = new Date(year, month, day);
+                date.setHours(0,0,0,0);
+                const isToday = date.getTime() === today.getTime();
+                const isPast = date < today;
+                container.appendChild(this.createDayCell(date, isToday, isPast, false));
+            }
+            
+            // Next month (fill to 42 cells)
+            for (let day = 1; container.children.length < 42; day++) {
+                const date = new Date(year, month + 1, day);
+                container.appendChild(this.createDayCell(date, false, false, true));
+            }
+        }
+
+        createDayCell(date, isToday, isPast, isOtherMonth) {
+            const dateStr = this.formatDate(date);
+            const tasks = this.state.tasks.filter(t => t.date === dateStr);
+            const cell = document.createElement('div');
+            cell.className = `calendar-day ${isToday?'today':''} ${isPast?'past':''} ${isOtherMonth?'other-month':''}`;
+            cell.innerHTML = `
+                <div class="day-number">${date.getDate()}</div>
+                ${tasks.length ? `<div class="day-task-count">${tasks.filter(t=>t.completed).length}/${tasks.length}</div>` : ''}
+                <button class="day-add-btn" onclick="event.stopPropagation(); app.addTaskToDate('${dateStr}')">+</button>
+            `;
+            cell.onclick = () => this.viewDayDetails(date);
+            return cell;
+        }
+
+        renderDataView() {
+            const container = document.getElementById('notesList');
+            if(!this.state.notes.length) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-book"></i><p>No notes yet</p><button class="btn" onclick="app.addNote()">Add Note</button></div>';
+                return;
+            }
+            container.innerHTML = this.state.notes.map(n=>`
+                <div class="note-item" onclick="app.editNote('${n.id}')">
+                    <div class="note-content">${escapeHtml(n.content.substring(0,120))}${n.content.length>120?'...':''}</div>
+                    <div class="note-meta">${new Date(n.createdAt).toLocaleDateString()}</div>
+                </div>
+            `).join('');
+        }
+
+        viewTask(taskId) {
+            const task = this.state.tasks.find(t=>t.id===taskId); 
+            if(!task) return;
+            
+            const schedule = this.state.dailySchedule.find(s=>s.id===task.scheduleId);
+            const content = `
+                <h3 style="margin-bottom:12px;">${escapeHtml(task.title)}</h3>
+                <div class="info-row"><div class="info-label">Date</div><div class="info-value">${this.parseLocalDate(task.date).toLocaleDateString()}</div></div>
+                <div class="info-row"><div class="info-label">Time</div><div class="info-value">${task.time} min</div></div>
+                <div class="info-row"><div class="info-label">Schedule</div><div class="info-value">${schedule?`${schedule.time} ${schedule.title}`:'Unscheduled'}</div></div>
+                <div class="info-row"><div class="info-label">Status</div><div class="info-value"><span class="status-badge ${task.completed?'completed':''}">${task.completed?'Completed':'Pending'}</span></div></div>
+                ${task.notes?`<div style="margin-top:12px;padding:8px;background:var(--bg-secondary);border-radius:var(--radius-md);">${escapeHtml(task.notes)}</div>`:''}
+            `;
+            
+            this.showModal('Task', content, [
+                {label:'Close', handler:'app.closeModal()'},
+                {label:'Edit', handler:`app.editTask('${task.id}')`},
+                {label: task.completed?'Mark incomplete':'Mark complete', handler:`app.toggleTaskCompletion('${task.id}')`, primary:true}
+            ]);
+        }
+
+        editTask(taskId) {
+            this.editingTaskId = taskId;
+            const task = this.state.tasks.find(t=>t.id===taskId);
+            if(!task) return;
+            
+            const scheduleOptions = this.state.dailySchedule.map(s=>`<option value="${s.id}" ${s.id===task.scheduleId?'selected':''}>${s.time} ${s.title}</option>`).join('');
+            
+            const content = `
+                <div class="form-group"><label>Title</label><input class="form-input" id="taskTitle" value="${escapeHtml(task.title)}"></div>
+                <div class="form-group"><label>Date</label><input class="form-input" type="date" id="taskDate" value="${task.date}"></div>
+                <div class="form-group"><label>Schedule</label><select class="form-input" id="taskSchedule"><option value="">None</option>${scheduleOptions}</select></div>
+                <div class="form-group"><label>Minutes</label><input class="form-input" type="number" id="taskTime" value="${task.time}" step="15" min="5" max="480"></div>
+                <div class="form-group"><label>Notes</label><textarea class="form-input form-textarea" id="taskNotes">${escapeHtml(task.notes||'')}</textarea></div>
+            `;
+            
+            this.showModal('Edit Task', content, [
+                {label:'Cancel', handler:'app.closeModal()'},
+                {label:'Delete', handler:`app.deleteTask('${task.id}')`},
+                {label:'Save', handler:'app.updateTask()', primary:true}
+            ]);
+        }
+
+        updateTask() {
+            const title = document.getElementById('taskTitle')?.value.trim();
+            const date = document.getElementById('taskDate')?.value;
+            const scheduleId = document.getElementById('taskSchedule')?.value || null;
+            const time = parseInt(document.getElementById('taskTime')?.value) || 60;
+            const notes = document.getElementById('taskNotes')?.value.trim();
+            
+            if(!title || !date) { this.showToast('Title and date required'); return; }
+            
+            const task = this.state.tasks.find(t=>t.id===this.editingTaskId);
+            if(task) { 
+                Object.assign(task, { title, date, scheduleId, time, notes }); 
+                this.saveState(); 
+                this.closeModal(); 
+                this.renderCurrentView(); 
+                this.showToast('Task updated'); 
+            }
+        }
+
+        deleteTask(taskId) { 
+            if(!confirm('Delete task?')) return;
+            this.state.tasks = this.state.tasks.filter(t=>t.id!==taskId); 
+            this.saveState(); 
+            this.closeModal(); 
+            this.renderCurrentView(); 
+            this.showToast('Task deleted'); 
+        }
+        
+        toggleTaskCompletion(taskId) {
+            const task = this.state.tasks.find(t=>t.id===taskId);
+            if(task){ 
+                task.completed = !task.completed; 
+                this.saveState(); 
+                this.closeModal(); 
+                this.renderCurrentView(); 
+                if(window.navigator && window.navigator.vibrate) window.navigator.vibrate(50);
+                this.showToast(task.completed?'Completed ✓':'Uncompleted'); 
+            }
+        }
+
+        addTask(scheduleId=null, date=null) {
+            this.editingTaskId = null;
+            const defaultDate = date || this.formatDate(new Date());
+            const scheduleOptions = this.state.dailySchedule.map(s=>`<option value="${s.id}" ${s.id===scheduleId?'selected':''}>${s.time} ${s.title}</option>`).join('');
+            
+            const content = `
+                <div class="form-group"><label>Title</label><input class="form-input" id="taskTitle" placeholder="e.g., Design homepage"></div>
+                <div class="form-group"><label>Date</label><input class="form-input" type="date" id="taskDate" value="${defaultDate}"></div>
+                <div class="form-group"><label>Schedule</label><select class="form-input" id="taskSchedule"><option value="">None</option>${scheduleOptions}</select></div>
+                <div class="form-group"><label>Minutes</label><input class="form-input" type="number" id="taskTime" value="60" step="15" min="5" max="480"></div>
+                <div class="form-group"><label>Notes</label><textarea class="form-input form-textarea" id="taskNotes" rows="2" placeholder="Optional notes..."></textarea></div>
+            `;
+            
+            this.showModal('Add Task', content, [
+                {label:'Cancel', handler:'app.closeModal()'},
+                {label:'Add', handler:'app.saveNewTask()', primary:true}
+            ]);
+        }
+
+        saveNewTask() {
+            const title = document.getElementById('taskTitle')?.value.trim();
+            const date = document.getElementById('taskDate')?.value;
+            const scheduleId = document.getElementById('taskSchedule')?.value || null;
+            const time = parseInt(document.getElementById('taskTime')?.value) || 60;
+            const notes = document.getElementById('taskNotes')?.value.trim();
+            
+            if(!title || !date) { this.showToast('Title and date required'); return; }
+            
+            const newTask = { 
+                id: 'task_' + Date.now(), 
+                title, time, date, scheduleId, notes, completed: false 
+            };
+            
+            this.state.tasks.push(newTask);
+            this.saveState();
+            this.closeModal();
+            this.renderCurrentView();
+            this.showToast('Task added');
+        }
+
+        addTaskToDate(dateStr) { this.addTask(null, dateStr); }
+        addTaskToSchedule(scheduleId) { this.addTask(scheduleId, this.formatDate(this.currentDate)); }
+
+        viewTimeBlock(scheduleId) {
+            const schedule = this.state.dailySchedule.find(s=>s.id===scheduleId);
+            const tasks = this.state.tasks.filter(t=>t.scheduleId===scheduleId && t.date===this.formatDate(this.currentDate));
+            const list = tasks.length ? tasks.map(t=>createTaskListItem(t, `app.viewTask('${t.id}')`)).join('') : '<p style="text-align:center;padding:16px;">No tasks</p>';
+            this.showModal(`${schedule.time} - ${schedule.title}`, 
+                `${list}<button class="btn" onclick="app.addTaskToSchedule('${scheduleId}')" style="margin-top:12px;width:100%;">+ Add Task</button>`, 
+                [{label:'Close',handler:'app.closeModal()',primary:true}]);
+        }
+
+        viewDayDetails(date) {
+            const tasks = this.state.tasks.filter(t=>t.date===this.formatDate(date));
+            const list = tasks.length ? tasks.map(t=>createTaskListItem(t, `app.viewTask('${t.id}')`)).join('') : '<p style="text-align:center;padding:16px;">No tasks</p>';
+            this.showModal(date.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}), 
+                `${list}<button class="btn" onclick="app.addTaskToDate('${this.formatDate(date)}')" style="margin-top:12px;width:100%;">+ Add Task</button>`, 
+                [{label:'Close',handler:'app.closeModal()',primary:true}]);
+        }
+
+        // Notes
+        addNote() {
+            this.editingNoteId = null;
+            this.showModal('Add Note', `
+                <div class="form-group"><textarea class="form-input form-textarea" id="noteContent" rows="4" placeholder="Write your note..."></textarea></div>
+            `, [
+                {label:'Cancel', handler:'app.closeModal()'},
+                {label:'Save', handler:'app.saveNote()', primary:true}
+            ]);
+        }
+
+        editNote(noteId) {
+            this.editingNoteId = noteId;
+            const note = this.state.notes.find(n=>n.id===noteId);
+            if(!note) return;
+            this.showModal('Edit Note', `
+                <div class="form-group"><textarea class="form-input form-textarea" id="noteContent" rows="4">${escapeHtml(note.content)}</textarea></div>
+            `, [
+                {label:'Cancel', handler:'app.closeModal()'},
+                {label:'Delete', handler:`app.deleteNote('${note.id}')`},
+                {label:'Update', handler:'app.updateNote()', primary:true}
+            ]);
+        }
+
+        saveNote() {
+            const content = document.getElementById('noteContent')?.value.trim();
+            if(!content) { this.showToast('Content required'); return; }
+            const newNote = { id:'note_'+Date.now(), content, createdAt:new Date().toISOString() };
+            this.state.notes.unshift(newNote);
+            this.saveState();
+            this.closeModal();
+            this.renderDataView();
+            this.showToast('Note saved');
+        }
+
+        updateNote() {
+            const content = document.getElementById('noteContent')?.value.trim();
+            if(!content) return;
+            const note = this.state.notes.find(n=>n.id===this.editingNoteId);
+            if(note) { note.content = content; this.saveState(); this.closeModal(); this.renderDataView(); this.showToast('Note updated'); }
+        }
+
+        deleteNote(noteId) {
+            if(!confirm('Delete note?')) return;
+            this.state.notes = this.state.notes.filter(n=>n.id!==noteId);
+            this.saveState(); this.closeModal(); this.renderDataView(); this.showToast('Note deleted');
+        }
+
+        // Navigation
+        prevMonth() { 
+            this.currentDate.setMonth(this.currentDate.getMonth() - 1); 
+            this.renderCalendarView(); 
+            this.updateDateDisplay(); 
+        }
+        nextMonth() { 
+            this.currentDate.setMonth(this.currentDate.getMonth() + 1); 
+            this.renderCalendarView(); 
+            this.updateDateDisplay(); 
+        }
+        goToToday() { 
+            this.currentDate = this.getToday(); 
+            this.updateDateDisplay(); 
+            this.renderCalendarView(); 
+        }
+
+        showModal(title, body, actions) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = body;
+            document.getElementById('modalActions').innerHTML = actions.map(a=>`<button class="btn ${a.primary?'':'btn-secondary'}" onclick="${a.handler}">${a.label}</button>`).join('');
+            document.getElementById('modal').classList.add('active');
+        }
+        
+        closeModal() { 
+            document.getElementById('modal').classList.remove('active'); 
+            this.editingTaskId = null; 
+            this.editingNoteId = null; 
+        }
+        
+        showToast(m) { 
+            const t = document.getElementById('toast'); 
+            t.textContent = m;
+            t.classList.add('show'); 
+            setTimeout(() => t.classList.remove('show'), 2000); 
+        }
+
+        setupEventListeners() {
+            document.getElementById('themeToggle').addEventListener('click', ()=>this.toggleTheme());
+            document.getElementById('closeModalBtn').addEventListener('click', ()=>this.closeModal());
+            document.getElementById('currentDate').addEventListener('click', ()=>{ 
+                this.currentDate = this.getToday(); 
+                this.updateDateDisplay(); 
+                this.switchView('flow'); 
+            });
+            
+            document.querySelectorAll('.sidebar-item, .nav-item').forEach(i=>{
+                i.addEventListener('click', (e)=>this.switchView(e.currentTarget.dataset.view));
+            });
+            
+            document.getElementById('prevMonth')?.addEventListener('click', ()=>this.prevMonth());
+            document.getElementById('nextMonth')?.addEventListener('click', ()=>this.nextMonth());
+            document.getElementById('todayCalendarBtn')?.addEventListener('click', ()=>{ 
+                this.goToToday();
+                this.switchView('calendar'); 
+            });
+            
+            document.getElementById('addNoteBtn')?.addEventListener('click', ()=>this.addNote());
+            
+            document.addEventListener('keydown', (e) => { if(e.key === 'Escape') this.closeModal(); });
+            document.getElementById('modal').addEventListener('click', (e) => { if(e.target === document.getElementById('modal')) this.closeModal(); });
+        }
+        
+        switchView(view) { 
+            this.currentView = view; 
+            this.renderCurrentView(); 
+            this.closeModal(); 
+        }
+    }
+
+    // PWA install prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        // Store the event for later use
+        if (window.app) {
+            window.app.deferredPrompt = e;
+        }
+        setTimeout(() => {
+            if(!window.matchMedia('(display-mode: standalone)').matches && window.app) {
+                document.getElementById('installPrompt').style.display = 'flex';
+            }
+        }, 2000);
+    });
+
+    // Initialize app
+    window.app = new CathedralOS();
+})();
+</script>
 </body>
 </html>
